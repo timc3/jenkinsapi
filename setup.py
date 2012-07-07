@@ -27,9 +27,10 @@ setup(name=PROJECT_NAME.lower(),
       packages=["jenkinsapi", 'jenkinsapi.utils', 'jenkinsapi.command_line'],
       zip_safe=True,
       include_package_data=False,
-      install_requires=['beautifulsoup4', 'lxml'],
+      install_requires=['beautifulsoup4==4.1.1'],
       entry_points=GLOBAL_ENTRY_POINTS,
       url=PROJECT_URL,
       description=SHORT_DESCRIPTION,
       long_description=DESCRIPTION,
+      extras_require = { 'xml':['lxml==2.3.4'] }
       )
