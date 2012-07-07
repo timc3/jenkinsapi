@@ -41,7 +41,14 @@ class Jenkins(JenkinsBase):
         self.proxyuser = proxyuser
         self.proxypass = proxypass
         JenkinsBase.__init__(self, baseurl, formauth=formauth)
-
+    
+    def newjk(self):
+        newjk = Jenkins(self.baseurl, username=self.username,
+                        password=self.password, proxyhost=self.proxyhost,
+                        proxyport=self.proxyport, proxyuser=self.proxyuser,
+                        proxypass=self.proxypass, formauth=self.formauth)
+        return 
+    
     def get_proxy_auth(self):
         return self.proxyhost, self.proxyport, self.proxyuser, self.proxypass
 
@@ -162,10 +169,7 @@ class Jenkins(JenkinsBase):
                                'from': jobname})
         copy_job_url = urllib.parse.urljoin(self.baseurl, "createItem?%s" % qs)
         self.post_data(copy_job_url, '')
-        newjk = Jenkins(self.baseurl, username=self.username,
-                        password=self.password, proxyhost=self.proxyhost,
-                        proxyport=self.proxyport, proxyuser=self.proxyuser,
-                        proxypass=self.proxypass, formauth=self.formauth)
+        newjk = self.newjk()
         return newjk.get_job(newjobname)
 
     def delete_job(self, jobname):
@@ -176,11 +180,19 @@ class Jenkins(JenkinsBase):
         """
         delete_job_url = urllib.parse.urljoin(Jenkins(self.baseurl).get_job(jobname).baseurl, "doDelete" )
         self.post_data(delete_job_url, '')
-        newjk = Jenkins(self.baseurl, username=self.username,
-                        password=self.password, proxyhost=self.proxyhost,
-                        proxyport=self.proxyport, proxyuser=self.proxyuser,
-                        proxypass=self.proxypass, formauth=self.formauth)
+        newjk = self.newjk()
         return newjk
+    
+    def create_job(self, newjobname):
+        """
+        Create a job by name
+        :param jobname: name of a exist job, str
+        :return: new Job obj
+        """
+        query_string = urllib.parse.urlencode({'name': newjobname})
+        create_job_url = copy_job_url = urllib.parse.urljoin(self.baseurl, "createItem?%s" % query_string)
+        newjk = self.newjk()
+        return newjk.get_job(newjobname)
 
     def iteritems(self):
         return self.get_jobs()
