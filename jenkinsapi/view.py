@@ -1,6 +1,11 @@
 from jenkinsapi.jenkinsbase import JenkinsBase
 from jenkinsapi.job import Job
-import urllib.request, urllib.parse, urllib.error
+try:
+    #Python 3
+    from urllib.parse import urlencode
+except ImportError:
+    #Python 2
+    from urllib2 import urlencode
 
 class View(JenkinsBase):
 
@@ -81,7 +86,7 @@ class View(JenkinsBase):
                 data[job]='on'
             data[str_job_name] = "on"
             data['json'] = data.copy()
-            self.post_data('%sconfigSubmit' % self.baseurl, urllib.parse.urlencode(data))
+            self.post_data('%sconfigSubmit' % self.baseurl, urlencode(data))
             return "Job %s is add in View %s successful" % (str_job_name, self.baseurl)
 
     def id(self):

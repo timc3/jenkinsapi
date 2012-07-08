@@ -1,12 +1,18 @@
 from jenkinsapi.artifact import Artifact
-from jenkinsapi import constants
+from jenkinsapi.constants import RE_SPLIT_VIEW_URL
 from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.exceptions import ArtifactsMissing, TimeOut, BadURL
-from urllib2 import urlparse
 
 import os
 import time
 import logging
+
+try:
+    #Python 3
+    from urllib.parse import urljoin
+except ImportError:
+    #Python 2
+    from urllib2 import urljoin
 
 log = logging.getLogger(__name__)
 
@@ -105,7 +111,7 @@ def get_view_from_url(url):
     """
     Factory method
     """
-    matched = constants.RE_SPLIT_VIEW_URL.search(url)
+    matched = RE_SPLIT_VIEW_URL.search(url)
     if not matched:
         raise BadURL("Cannot parse URL %s" % url)
     jenkinsurl, view_name = matched.groups()
@@ -132,7 +138,7 @@ def install_artifacts(artifacts, dirstruct, installdir, basestaticurl):
                     theartifact = artifacts[artifactname]
                 else:
                     # It's probably a static file, we can get it from the static collection
-                    staticurl = urlparse.urljoin(basestaticurl, artifactname)
+                    staticurl = urljoin(basestaticurl, artifactname)
                     theartifact = Artifact(artifactname, staticurl)
                 theartifact.save(destpath)
                 installed.append(destpath)

@@ -7,14 +7,19 @@ artifacts associated with it.
 This module provides a class called Artifact which allows you to download objects from the server
 and also access them as a stream.
 """
-
-import urllib.request, urllib.parse, urllib.error
 import os
 import logging
 import hashlib
 
 from jenkinsapi.exceptions import ArtifactBroken
 from jenkinsapi.fingerprint import Fingerprint
+
+try:
+    #Python 3
+    from urllib.request import urlretrieve
+except ImportError:
+    #Python 2
+    from urllib2 import urlretrieve
 
 log = logging.getLogger(__name__)
 
@@ -63,7 +68,7 @@ class Artifact(object):
         """
         Download the the artifact to a path.
         """
-        filename, _ = urllib.request.urlretrieve(self.url, filename=fspath)
+        filename, _ = urlretrieve(self.url, filename=fspath)
         return filename
 
     def _verify_download(self, fspath):
