@@ -1,10 +1,15 @@
+import re
+import logging
+
 from jenkinsapi.jenkinsbase import JenkinsBase
 from jenkinsapi.exceptions import ArtifactBroken
 
-import urllib.request, urllib.error, urllib.parse
-import re
-
-import logging
+try:
+    #Python 3
+    from urllib.error import HTTPError
+except ImportError:
+    #Python 2
+    from urllib2 import HTTPError
 
 log = logging.getLogger( __name__ )
 
@@ -34,7 +39,7 @@ class Fingerprint(JenkinsBase):
         """
         try:
             self.poll()
-        except urllib.error.HTTPError:
+        except HTTPError:
             return False
         return True
 
@@ -62,7 +67,7 @@ class Fingerprint(JenkinsBase):
             assert self.valid()
         except AssertionError:
             raise ArtifactBroken( "Artifact %s seems to be broken, check %s" % ( self.id, self.baseurl ) )
-        except urllib.error.HTTPError:
+        except HTTPError:
             raise ArtifactBroken( "Unable to validate artifact id %s using %s" % ( self.id, self.baseurl ) )
         return True
 
