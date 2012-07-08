@@ -4,7 +4,7 @@ from jenkinsapi.job import Job
 from jenkinsapi.view import View
 from jenkinsapi.node import Node
 from jenkinsapi.exceptions import UnknownJob, NotAuthorized
-from .utils.urlopener import mkurlopener, mkopener, NoAuto302Handler
+from jenkinsapi.utils.urlopener import mkurlopener, mkopener, NoAuto302Handler
 import logging
 import time
 import urllib.request, urllib.error, urllib.parse
@@ -43,11 +43,10 @@ class Jenkins(JenkinsBase):
         JenkinsBase.__init__(self, baseurl, formauth=formauth)
     
     def newjk(self):
-        newjk = Jenkins(self.baseurl, username=self.username,
-                        password=self.password, proxyhost=self.proxyhost,
-                        proxyport=self.proxyport, proxyuser=self.proxyuser,
-                        proxypass=self.proxypass, formauth=self.formauth)
-        return 
+        return Jenkins(self.baseurl, username=self.username,
+                       password=self.password, proxyhost=self.proxyhost,
+                       proxyport=self.proxyport, proxyuser=self.proxyuser,
+                       proxypass=self.proxypass, formauth=self.formauth)
     
     def get_proxy_auth(self):
         return self.proxyhost, self.proxyport, self.proxyuser, self.proxypass
@@ -190,7 +189,8 @@ class Jenkins(JenkinsBase):
         :return: new Job obj
         """
         query_string = urllib.parse.urlencode({'name': newjobname})
-        create_job_url = copy_job_url = urllib.parse.urljoin(self.baseurl, "createItem?%s" % query_string)
+        create_job_url = urllib.parse.urljoin(self.baseurl, "createItem?%s" % query_string)
+        self.post_data(create_job_url, '')
         newjk = self.newjk()
         return newjk.get_job(newjobname)
 

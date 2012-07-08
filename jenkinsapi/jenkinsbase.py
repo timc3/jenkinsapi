@@ -76,13 +76,14 @@ class JenkinsBase(object):
     def post_data(self, url, content):
         try:
             urlopen = self.get_jenkins_obj().get_opener()
-            return urlopen(url, data=content).read().strip()
+            unicode_content = content.encode("UTF-8")
+            result = urlopen(url, data=unicode_content).read().strip()
         except urllib.error.HTTPError as e:
             log.warn("Error post data %s" % url)
             log.exception(e)
             raise
         return result
-
+        
     def hit_url(self, url ):
         fn_urlopen = self.get_jenkins_obj().get_opener()
         try:
