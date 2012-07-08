@@ -2,7 +2,7 @@ import random
 import unittest
 
 from jenkinsapi.jenkins import Jenkins
-from test_config import defaultConfig
+from jenkinsapi_tests.test_config import defaultConfig
 from hamcrest import assert_that, greater_than
 from string import ascii_letters
 

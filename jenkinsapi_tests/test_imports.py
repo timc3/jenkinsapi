@@ -14,10 +14,6 @@ class test_imports(unittest.TestCase):
         log.info(repr(jenkinsapi.jenkins))
     
     def testImportThree(self):
-        import jenkins
-        log.info(repr(jenkins))
-    
-    def testImportFour(self):
         from jenkinsapi.jenkins import Jenkins
         log.info(repr(Jenkins))
     
