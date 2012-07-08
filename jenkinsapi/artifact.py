@@ -19,7 +19,7 @@ try:
     from urllib.request import urlretrieve
 except ImportError:
     #Python 2
-    from urllib2 import urlretrieve
+    from urllib import urlretrieve
 
 log = logging.getLogger(__name__)
 
