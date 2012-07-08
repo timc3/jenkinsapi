@@ -11,7 +11,8 @@ try:
     from urllib.parse import urlencode, urljoin
 except ImportError:
     #Python 2
-    from urllib import urlencode, urljoin
+    from urllib import urlencode
+    from urlparse import urljoin
 
 log = logging.getLogger(__name__)
 
