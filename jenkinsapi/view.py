@@ -5,7 +5,7 @@ try:
     from urllib.parse import urlencode
 except ImportError:
     #Python 2
-    from urllib2 import urlencode
+    from urllib import urlencode
 
 class View(JenkinsBase):
 

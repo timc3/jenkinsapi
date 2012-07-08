@@ -13,7 +13,8 @@ try:
     from urllib.error import HTTPError
 except ImportError:
     #Python 2
-    from urllib2 import HTTPCookieProcessor, urlencode, HTTPError, quote
+    from urllib2 import HTTPCookieProcessor, HTTPError, quote
+    from urllib import urlencode
     from urlparse import urljoin
 
 import logging
