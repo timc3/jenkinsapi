@@ -29,6 +29,7 @@ class Job(JenkinsBase):
         JenkinsBase.__init__( self, url )
 
     def id( self ):
+        #TODO: We cannot have a function called id, it conflicts with a built-in
         return self._data["name"]
 
     def __str__(self):
