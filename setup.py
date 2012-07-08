@@ -32,5 +32,5 @@ setup(name=PROJECT_NAME.lower(),
       url=PROJECT_URL,
       description=SHORT_DESCRIPTION,
       long_description=DESCRIPTION,
-      extras_require = { 'xml':['lxml==2.3.4'] }
+      #extras_require = { 'xml':['lxml==2.3.4'] }
       )
