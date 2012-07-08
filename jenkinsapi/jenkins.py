@@ -11,15 +11,17 @@ try:
     from urllib.request import HTTPCookieProcessor
     from urllib.parse import urlencode, urljoin, quote
     from urllib.error import HTTPError
+    from http import cookiejar
 except ImportError:
     #Python 2
     from urllib2 import HTTPCookieProcessor, HTTPError, quote
     from urllib import urlencode
     from urlparse import urljoin
+    from cookielib import MozillaCookieJar as cookiejar
 
 import logging
 import time
-import http.cookiejar
+
 try:
     import json
 except ImportError:
@@ -78,7 +80,7 @@ class Jenkins(JenkinsBase):
     def get_login_opener(self):
         hdrs = []
         if getattr(self, '_cookies', False):
-            mcj = http.cookiejar.MozillaCookieJar()
+            mcj = cookiejar.MozillaCookieJar()
             for c in self._cookies:
                 mcj.set_cookie(c)
             hdrs.append(HTTPCookieProcessor(mcj))
@@ -91,7 +93,7 @@ class Jenkins(JenkinsBase):
         formdata = urlencode(formdata)
 
         loginurl = urljoin(self.baseurl, 'j_acegi_security_check')
-        mcj = http.cookiejar.MozillaCookieJar()
+        mcj = cookiejar.MozillaCookieJar()
         cookiehandler = HTTPCookieProcessor(mcj)
 
         urlopen = mkopener(NoAuto302Handler, cookiehandler)
