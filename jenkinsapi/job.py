@@ -4,14 +4,14 @@ from collections import defaultdict
 from time import sleep
 from jenkinsapi.build import Build
 from jenkinsapi.jenkinsbase import JenkinsBase
-from .exceptions import NoBuildData, NotFound
+from jenkinsapi.exceptions import NoBuildData, NotFound
 
 try:
     #Python 3
     from urllib.parse import urlencode, urljoin
 except ImportError:
     #Python 2
-    from urllib2 import urlencode, urljoin
+    from urllib import urlencode, urljoin
 
 log = logging.getLogger(__name__)
 
