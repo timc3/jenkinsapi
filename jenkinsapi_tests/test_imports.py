@@ -17,6 +17,15 @@ class test_imports(unittest.TestCase):
         from jenkinsapi.jenkins import Jenkins
         log.info(repr(Jenkins))
     
-
+    def testImportMainModules(self):
+        import jenkinsapi.jenkins
+        import jenkinsapi.job
+        import jenkinsapi.artifact
+        import jenkinsapi.node
+        import jenkinsapi.fingerprint
+        import jenkinsapi.build
+        import jenkinsapi.result
+        import jenkinsapi.view
+        
 if __name__ == "__main++":
     unittest.main()
