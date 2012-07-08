@@ -1,4 +1,10 @@
-import urllib.request, urllib.error, urllib.parse
+try:
+    # Python 3
+    from urllib.error import HTTPError
+except ImportError:
+    # Python 2
+    from urllib2 import HTTPError    
+    
 import logging
 import pprint
 from jenkinsapi import config
@@ -32,7 +38,7 @@ class JenkinsBase(object):
         if poll and not self.formauth:
             try:
                 self.poll()
-            except urllib.error.HTTPError as hte:
+            except HTTPError as hte:
                 log.exception(hte)
                 log.warn( "Failed to conenct to %s" % baseurl )
                 raise
@@ -67,7 +73,7 @@ class JenkinsBase(object):
         try:
             stream = fn_urlopen(url)
             result = eval(stream.read())
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             log.warn("Error reading %s" % url)
             log.exception(e)
             raise
@@ -78,7 +84,7 @@ class JenkinsBase(object):
             urlopen = self.get_jenkins_obj().get_opener()
             unicode_content = content.encode("UTF-8")
             result = urlopen(url, data=unicode_content).read().strip()
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             log.warn("Error post data %s" % url)
             log.exception(e)
             raise
@@ -89,7 +95,7 @@ class JenkinsBase(object):
         try:
             stream = fn_urlopen( url )
             html_result = stream.read()
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             log.debug( "Error reading %s" % url )
             log.exception(e)
             raise

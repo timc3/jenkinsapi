@@ -5,11 +5,18 @@ from jenkinsapi.view import View
 from jenkinsapi.node import Node
 from jenkinsapi.exceptions import UnknownJob, NotAuthorized
 from jenkinsapi.utils.urlopener import mkurlopener, mkopener, NoAuto302Handler
+
+try:
+    #Python 3
+    from urllib.request import HTTPCookieProcessor
+    from urllib.parse import urlencode, urljoin, quote
+    from urllib.error import HTTPError
+except ImportError:
+    #Python 2
+    from urllib2 import HTTPCookieProcessor, urlencode, urljoin, HTTPError, quote
+
 import logging
 import time
-import urllib.request, urllib.error, urllib.parse
-import urllib.request, urllib.parse, urllib.error
-import urllib.parse
 import http.cookiejar
 try:
     import json
@@ -72,18 +79,18 @@ class Jenkins(JenkinsBase):
             mcj = http.cookiejar.MozillaCookieJar()
             for c in self._cookies:
                 mcj.set_cookie(c)
-            hdrs.append(urllib.request.HTTPCookieProcessor(mcj))
+            hdrs.append(HTTPCookieProcessor(mcj))
         return mkopener(*hdrs)
 
     def login(self):
         formdata = dict(j_username=self.username, j_password=self.password,
                         remember_me=True, form='/')
         formdata.update(dict(json=json.dumps(formdata), Submit='log in'))
-        formdata = urllib.parse.urlencode(formdata)
+        formdata = urlencode(formdata)
 
-        loginurl = urllib.parse.urljoin(self.baseurl, 'j_acegi_security_check')
+        loginurl = urljoin(self.baseurl, 'j_acegi_security_check')
         mcj = http.cookiejar.MozillaCookieJar()
-        cookiehandler = urllib.request.HTTPCookieProcessor(mcj)
+        cookiehandler = HTTPCookieProcessor(mcj)
 
         urlopen = mkopener(NoAuto302Handler, cookiehandler)
         res = urlopen(loginurl, data=formdata)
@@ -99,7 +106,7 @@ class Jenkins(JenkinsBase):
         '''Try and reload the configuration from disk'''
         try:
             self.hit_url("%(baseurl)s/reload" % self.__dict__)
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             if e.code == 403:
                 raise NotAuthorized("You are not authorized to reload this server")
             raise
@@ -163,10 +170,10 @@ class Jenkins(JenkinsBase):
         :param newjobname: name of new job, str
         :return: new Job obj
         """
-        qs = urllib.parse.urlencode({'name': newjobname,
+        qs = urlencode({'name': newjobname,
                                'mode': 'copy',
                                'from': jobname})
-        copy_job_url = urllib.parse.urljoin(self.baseurl, "createItem?%s" % qs)
+        copy_job_url = urljoin(self.baseurl, "createItem?%s" % qs)
         self.post_data(copy_job_url, '')
         newjk = self.newjk()
         return newjk.get_job(newjobname)
@@ -177,7 +184,7 @@ class Jenkins(JenkinsBase):
         :param jobname: name of a exist job, str
         :return: new jenkins_obj
         """
-        delete_job_url = urllib.parse.urljoin(Jenkins(self.baseurl).get_job(jobname).baseurl, "doDelete" )
+        delete_job_url = urljoin(Jenkins(self.baseurl).get_job(jobname).baseurl, "doDelete" )
         self.post_data(delete_job_url, '')
         newjk = self.newjk()
         return newjk
@@ -188,8 +195,8 @@ class Jenkins(JenkinsBase):
         :param jobname: name of a exist job, str
         :return: new Job obj
         """
-        query_string = urllib.parse.urlencode({'name': newjobname})
-        create_job_url = urllib.parse.urljoin(self.baseurl, "createItem?%s" % query_string)
+        query_string = urlencode({'name': newjobname})
+        create_job_url = urljoin(self.baseurl, "createItem?%s" % query_string)
         self.post_data(create_job_url, '')
         newjk = self.newjk()
         return newjk.get_job(newjobname)
@@ -251,13 +258,13 @@ class Jenkins(JenkinsBase):
         :param str_view_name: name of new view, str
         :return: new view obj
         """
-        url = urllib.parse.urljoin(self.baseurl, "user/%s/my-views/" % people) if people else self.baseurl
-        qs = urllib.parse.urlencode({'value': str_view_name})
-        viewExistsCheck_url = urllib.parse.urljoin(url, "viewExistsCheck?%s" % qs)
+        url = urljoin(self.baseurl, "user/%s/my-views/" % people) if people else self.baseurl
+        qs = urlencode({'value': str_view_name})
+        viewExistsCheck_url =urljoin(url, "viewExistsCheck?%s" % qs)
         fn_urlopen = self.get_jenkins_obj().get_opener()
         try:
             r = fn_urlopen(viewExistsCheck_url).read()
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             log.debug("Error reading %s" % viewExistsCheck_url)
             log.exception(e)
             raise
@@ -268,14 +275,14 @@ class Jenkins(JenkinsBase):
             data = {"mode":"hudson.model.ListView", "Submit": "OK"}
             data['name']=str_view_name
             data['json'] = data.copy()
-            params = urllib.parse.urlencode(data)
+            params = urlencode(data)
             try:
-                createView_url = urllib.parse.urljoin(url, "createView")
+                createView_url = urljoin(url, "createView")
                 result = self.post_data(createView_url, params)
-            except urllib.error.HTTPError as e:
+            except HTTPError as e:
                 log.debug("Error post_data %s" % createView_url)
                 log.exception(e)
-            return urllib.parse.urljoin(url, "view/%s/" % str_view_name)
+            return urljoin(url, "view/%s/" % str_view_name)
 
     def __getitem__(self, jobname):
         """
@@ -303,7 +310,7 @@ class Jenkins(JenkinsBase):
 
     def get_node_url(self, nodename=""):
         """Return the url for nodes"""
-        url = "%(baseurl)s/computer/%(nodename)s" % {'baseurl': self.baseurl, 'nodename': urllib.parse.quote(nodename)}
+        url = "%(baseurl)s/computer/%(nodename)s" % {'baseurl': self.baseurl, 'nodename': quote(nodename)}
         return url
 
     def has_node(self, nodename):
@@ -328,7 +335,7 @@ class Jenkins(JenkinsBase):
         fn_urlopen = self.get_jenkins_obj().get_opener()
         try:
             fn_urlopen(url).read()
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             log.debug("Error reading %s" % url)
             log.exception(e)
             raise
@@ -371,13 +378,13 @@ class Jenkins(JenkinsBase):
         }
         url = "%(nodeurl)s/doCreateItem?%(params)s" % {
             'nodeurl': self.get_node_url(),
-            'params': urllib.parse.urlencode(params)
+            'params': urlencode(params)
         }
         print(url)
         fn_urlopen = self.get_jenkins_obj().get_opener()
         try:
             fn_urlopen(url).read()
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             log.debug("Error reading %s" % url)
             log.exception(e)
             raise
