@@ -32,6 +32,14 @@ class test_crud(unittest.TestCase):
         assert_that( self.api.has_job(newjobname))
         self.api.delete_job(newjobname)
         assert_that(not(self.api.has_job(newjobname)))
+        
+    def testCheckNonExistantJob(self):
+        """
+        Think of a job name that most probably does not exist, and
+        verify that this is indeed the case
+        """
+        newjobname = "test_job_%s" % self.random_id()
+        assert_that(not(self.api.has_job(newjobname)))
     
 if __name__ == "__main++":
     unittest.main()
