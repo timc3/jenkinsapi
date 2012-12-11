@@ -262,3 +262,26 @@ class Build(JenkinsBase):
 
     def get_timestamp(self):
         return self._data['timestamp']
+
+    def get_runs_data(self):
+        """
+        In matrix build, a build can have a number of runs from the available configurations
+        """
+        return self._data.get('runs', [])
+
+    def get_runs(self):
+        """ 
+        Return build objects from the runs of different configurations in a matrix build
+        """
+        _runs = []
+        for _run in self.get_runs_data():
+            _runs.append(Build(_run.get('url'), _run.get('number'), self.job))
+        return _runs 
+
+    def get_runs_artifacts(self):
+        """Get a list of the artifacts for get_runs"""
+        _artifacts = {}
+        for _r in self.get_runs():
+            _artifacts.update(_r.get_artifact_dict())
+        return _artifacts
+

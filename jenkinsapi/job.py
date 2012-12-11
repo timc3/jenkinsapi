@@ -337,3 +337,9 @@ class Job(JenkinsBase):
         '''Enable job'''
         enableurl = urlparse.urljoin( self.baseurl, 'enable' )
         return self.post_data(enableurl, '')
+
+    def active_configurations(self):
+        """ This, I think, is mainly used in Matrix job configurations"""
+        return self._data.get('activeConfigurations', [])
+
+
